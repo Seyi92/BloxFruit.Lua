@@ -1,193 +1,480 @@
---// Blox Fruits Style - Rayfield Testing Hub
---// For use in your own Roblox experience
+--==================================================
+-- RAYFIELD TEST HUB
+--==================================================
 
 local Rayfield = loadstring(game:HttpGet(
     "https://sirius.menu/rayfield"
 ))()
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-
-local Player = Players.LocalPlayer
+--==================================================
+-- WINDOW
+--==================================================
 
 local Window = Rayfield:CreateWindow({
-    Name = "Blox Fruits | Testing Hub",
-    LoadingTitle = "Blox Fruits Testing Hub",
-    LoadingSubtitle = "Development / Testing",
+    Name = "Blox-Style Test Hub",
+    LoadingTitle = "Blox-Style Test Hub",
+    LoadingSubtitle = "Rayfield",
+    Theme = "Default",
+
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "BFTestingHub",
-        FileName = "Settings"
+        FolderName = "BloxStyleTestHub",
+        FileName = "Configuration"
     },
+
     Discord = {
         Enabled = false
     },
+
     KeySystem = false
 })
 
---// Variables
-local Speed = 16
-local JumpPower = 50
-local FlyEnabled = false
-local NoclipEnabled = false
-local ESPEnabled = false
-local InfEnergy = false
+--==================================================
+-- TABS
+--==================================================
 
-local FlyConnection
-local NoclipConnection
-local ESPConnection
+local Main = Window:CreateTab("Main")
+local Movement = Window:CreateTab("Movement")
+local Combat = Window:CreateTab("Combat")
+local Sea = Window:CreateTab("Sea Events")
+local Stats = Window:CreateTab("Stats")
+local Player = Window:CreateTab("Player")
+local Teleport = Window:CreateTab("Teleport")
+local Developer = Window:CreateTab("Developer")
+local Server = Window:CreateTab("Server")
+local Settings = Window:CreateTab("Settings")
 
---// Character
-local function GetCharacter()
-    return Player.Character or Player.CharacterAdded:Wait()
+--==================================================
+-- SETTINGS
+--==================================================
+
+local Config = {
+    Fly = false,
+    Noclip = false,
+    InfiniteJump = false,
+    WalkSpeed = 16,
+    JumpPower = 50,
+
+    AimAssist = false,
+    CameraLock = false,
+    AutoFlashStep = false,
+    InfiniteEnergy = false,
+
+    LevelFarm = false,
+    MaxLevelFarm = false,
+    AutoAttack = false,
+    AutoSelectEnemy = false,
+    AutoEquip = false,
+
+    SeaFarm = false,
+    AutoSail = false,
+    AutoFindEvent = false,
+    AutoAttackEvent = false,
+    AutoCollectRewards = false,
+
+    DamageTesting = false,
+    CooldownTesting = false,
+    HitboxTesting = false,
+
+    DangerLevel = "Level 1 - Low",
+
+    TargetPlayer = nil,
+
+    X = 0,
+    Y = 0,
+    Z = 0
+}
+
+--==================================================
+-- NOTIFICATION
+--==================================================
+
+local function Notify(title, message)
+    Rayfield:Notify({
+        Title = title,
+        Content = message,
+        Duration = 3
+    })
 end
 
-local function GetHumanoid()
-    local Character = GetCharacter()
-    return Character:FindFirstChildOfClass("Humanoid")
-end
+--==================================================
+-- MAIN
+--==================================================
 
---// MAIN
-local MainTab = Window:CreateTab("Main", 4483362458)
+Main:CreateSection("Farming")
 
-MainTab:CreateSlider({
+Main:CreateToggle({
+    Name = "Level Farm",
+    CurrentValue = false,
+    Flag = "LevelFarm",
+
+    Callback = function(Value)
+        Config.LevelFarm = Value
+    end
+})
+
+Main:CreateToggle({
+    Name = "Farm to Max Level",
+    CurrentValue = false,
+    Flag = "MaxLevelFarm",
+
+    Callback = function(Value)
+        Config.MaxLevelFarm = Value
+    end
+})
+
+Main:CreateToggle({
+    Name = "Auto Attack",
+    CurrentValue = false,
+    Flag = "AutoAttack",
+
+    Callback = function(Value)
+        Config.AutoAttack = Value
+    end
+})
+
+Main:CreateToggle({
+    Name = "Auto Select Enemy",
+    CurrentValue = false,
+    Flag = "AutoSelectEnemy",
+
+    Callback = function(Value)
+        Config.AutoSelectEnemy = Value
+    end
+})
+
+Main:CreateToggle({
+    Name = "Auto Equip Weapon",
+    CurrentValue = false,
+    Flag = "AutoEquip",
+
+    Callback = function(Value)
+        Config.AutoEquip = Value
+    end
+})
+
+--==================================================
+-- MOVEMENT
+--==================================================
+
+Movement:CreateSection("Movement")
+
+Movement:CreateToggle({
+    Name = "Fly",
+    CurrentValue = false,
+    Flag = "Fly",
+
+    Callback = function(Value)
+        Config.Fly = Value
+    end
+})
+
+Movement:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Flag = "Noclip",
+
+    Callback = function(Value)
+        Config.Noclip = Value
+    end
+})
+
+Movement:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+
+    Callback = function(Value)
+        Config.InfiniteJump = Value
+    end
+})
+
+Movement:CreateSlider({
     Name = "Walk Speed",
     Range = {16, 150},
     Increment = 1,
     Suffix = " Speed",
     CurrentValue = 16,
     Flag = "WalkSpeed",
-    Callback = function(Value)
-        Speed = Value
 
-        local Humanoid = GetHumanoid()
-        if Humanoid then
-            Humanoid.WalkSpeed = Value
-        end
+    Callback = function(Value)
+        Config.WalkSpeed = Value
     end
 })
 
-MainTab:CreateSlider({
+Movement:CreateSlider({
     Name = "Jump Power",
     Range = {50, 200},
     Increment = 1,
     Suffix = " Power",
     CurrentValue = 50,
     Flag = "JumpPower",
-    Callback = function(Value)
-        JumpPower = Value
 
-        local Humanoid = GetHumanoid()
-        if Humanoid then
-            Humanoid.UseJumpPower = true
-            Humanoid.JumpPower = Value
-        end
+    Callback = function(Value)
+        Config.JumpPower = Value
     end
 })
 
-MainTab:CreateToggle({
-    Name = "Fly",
-    CurrentValue = false,
-    Flag = "Fly",
-    Callback = function(Value)
+Movement:CreateButton({
+    Name = "Reset Movement",
 
-        FlyEnabled = Value
-
-        if FlyConnection then
-            FlyConnection:Disconnect()
-            FlyConnection = nil
-        end
-
-        if not Value then
-            return
-        end
-
-        FlyConnection = RunService.RenderStepped:Connect(function()
-            local Character = Player.Character
-            local Root = Character and Character:FindFirstChild("HumanoidRootPart")
-
-            if not Root then
-                return
-            end
-
-            local Camera = workspace.CurrentCamera
-            local Direction = Vector3.zero
-
-            if UIS:IsKeyDown(Enum.KeyCode.W) then
-                Direction += Camera.CFrame.LookVector
-            end
-
-            if UIS:IsKeyDown(Enum.KeyCode.S) then
-                Direction -= Camera.CFrame.LookVector
-            end
-
-            if UIS:IsKeyDown(Enum.KeyCode.A) then
-                Direction -= Camera.CFrame.RightVector
-            end
-
-            if UIS:IsKeyDown(Enum.KeyCode.D) then
-                Direction += Camera.CFrame.RightVector
-            end
-
-            if UIS:IsKeyDown(Enum.KeyCode.Space) then
-                Direction += Vector3.new(0, 1, 0)
-            end
-
-            if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
-                Direction -= Vector3.new(0, 1, 0)
-            end
-
-            if Direction.Magnitude > 0 then
-                Root.AssemblyLinearVelocity =
-                    Direction.Unit * Speed
-            else
-                Root.AssemblyLinearVelocity = Vector3.zero
-            end
-        end)
-    end
-})
-
-MainTab:CreateToggle({
-    Name = "Noclip",
-    CurrentValue = false,
-    Flag = "Noclip",
-    Callback = function(Value)
-
-        NoclipEnabled = Value
-
-        if NoclipConnection then
-            NoclipConnection:Disconnect()
-            NoclipConnection = nil
-        end
-
-        if not Value then
-            return
-        end
-
-        NoclipConnection = RunService.Stepped:Connect(function()
-
-            if not NoclipEnabled then
-                return
-            end
-
-            local Character = Player.Character
-
-            if Character then
-                for _, Object in ipairs(Character:GetDescendants()) do
-                    if Object:IsA("BasePart") then
-                        Object.CanCollide = false
-                    end
-                end
-            end
-        end)
-    end
-})
-
-MainTab:CreateButton({
-    Name = "Reset Character",
     Callback = function()
-        local Humanoid = GetHumanoid()
+        Config.Fly = false
+        Config.Noclip = false
+        Config.InfiniteJump = false
+        Config.WalkSpeed = 16
+        Config.JumpPower = 50
+
+        Notify("Movement", "Movement settings reset")
+    end
+})
+
+--==================================================
+-- COMBAT
+--==================================================
+
+Combat:CreateSection("Testing")
+
+Combat:CreateToggle({
+    Name = "Damage Testing",
+    CurrentValue = false,
+    Flag = "DamageTesting",
+
+    Callback = function(Value)
+        Config.DamageTesting = Value
+    end
+})
+
+Combat:CreateToggle({
+    Name = "Cooldown Testing",
+    CurrentValue = false,
+    Flag = "CooldownTesting",
+
+    Callback = function(Value)
+        Config.CooldownTesting = Value
+    end
+})
+
+Combat:CreateToggle({
+    Name = "Hitbox Testing",
+    CurrentValue = false,
+    Flag = "HitboxTesting",
+
+    Callback = function(Value)
+        Config.HitboxTesting = Value
+    end
+})
+
+Combat:CreateButton({
+    Name = "Training Dummy",
+
+    Callback = function()
+        Notify("Combat", "Training Dummy triggered")
+    end
+})
+
+--==================================================
+-- SEA EVENTS
+--==================================================
+
+Sea:CreateSection("Sea Event Farming")
+
+Sea:CreateToggle({
+    Name = "Sea Event Farm",
+    CurrentValue = false,
+    Flag = "SeaEventFarm",
+
+    Callback = function(Value)
+        Config.SeaFarm = Value
+    end
+})
+
+Sea:CreateDropdown({
+    Name = "Danger Level",
+
+    Options = {
+        "Level 1 - Low",
+        "Level 2 - Medium",
+        "Level 3 - High",
+        "Level 4 - Extreme",
+        "Level 5 - Crazy",
+        "Level 6 - ???"
+    },
+
+    CurrentOption = {"Level 1 - Low"},
+    MultipleOptions = false,
+    Flag = "DangerLevel",
+
+    Callback = function(Option)
+        Config.DangerLevel = Option[1]
+    end
+})
+
+Sea:CreateToggle({
+    Name = "Auto Sail",
+    CurrentValue = false,
+    Flag = "AutoSail",
+
+    Callback = function(Value)
+        Config.AutoSail = Value
+    end
+})
+
+Sea:CreateToggle({
+    Name = "Auto Find Event",
+    CurrentValue = false,
+    Flag = "AutoFindEvent",
+
+    Callback = function(Value)
+        Config.AutoFindEvent = Value
+    end
+})
+
+Sea:CreateToggle({
+    Name = "Auto Attack Event",
+    CurrentValue = false,
+    Flag = "AutoAttackEvent",
+
+    Callback = function(Value)
+        Config.AutoAttackEvent = Value
+    end
+})
+
+Sea:CreateToggle({
+    Name = "Auto Collect Rewards",
+    CurrentValue = false,
+    Flag = "AutoCollectRewards",
+
+    Callback = function(Value)
+        Config.AutoCollectRewards = Value
+    end
+})
+
+--==================================================
+-- STATS
+--==================================================
+
+Stats:CreateSection("Stat Points")
+
+local statNames = {
+    "Melee",
+    "Defense",
+    "Sword",
+    "Gun",
+    "Fruit"
+}
+
+for _, StatName in ipairs(statNames) do
+
+    Stats:CreateSlider({
+        Name = StatName .. " Points",
+        Range = {0, 1000},
+        Increment = 1,
+        Suffix = " Points",
+        CurrentValue = 0,
+        Flag = StatName .. "Points",
+
+        Callback = function(Value)
+            -- Connect to your own game's stat system here.
+        end
+    })
+
+end
+
+Stats:CreateButton({
+    Name = "Reset Stat Allocation",
+
+    Callback = function()
+        Notify("Stats", "Stat allocation reset")
+    end
+})
+
+--==================================================
+-- PLAYER
+--==================================================
+
+Player:CreateSection("Targeting")
+
+Player:CreateDropdown({
+    Name = "Target Player",
+    Options = {},
+    CurrentOption = {},
+    MultipleOptions = false,
+    Flag = "TargetPlayer",
+
+    Callback = function(Option)
+        Config.TargetPlayer = Option[1]
+    end
+})
+
+Player:CreateButton({
+    Name = "Refresh Players",
+
+    Callback = function()
+
+        local Players = game:GetService("Players")
+        local Names = {}
+
+        for _, Plr in ipairs(Players:GetPlayers()) do
+            table.insert(Names, Plr.Name)
+        end
+
+        Notify(
+            "Players",
+            "Found " .. tostring(#Names) .. " players"
+        )
+    end
+})
+
+Player:CreateToggle({
+    Name = "Auto Flash Step",
+    CurrentValue = false,
+    Flag = "AutoFlashStep",
+
+    Callback = function(Value)
+        Config.AutoFlashStep = Value
+    end
+})
+
+Player:CreateToggle({
+    Name = "Camera Lock",
+    CurrentValue = false,
+    Flag = "CameraLock",
+
+    Callback = function(Value)
+        Config.CameraLock = Value
+    end
+})
+
+Player:CreateToggle({
+    Name = "Aim Assist",
+    CurrentValue = false,
+    Flag = "AimAssist",
+
+    Callback = function(Value)
+        Config.AimAssist = Value
+    end
+})
+
+Player:CreateButton({
+    Name = "Heal",
+
+    Callback = function()
+        Notify("Player", "Heal triggered")
+    end
+})
+
+Player:CreateButton({
+    Name = "Reset Character",
+
+    Callback = function()
+
+        local Character =
+            game.Players.LocalPlayer.Character
+
+        local Humanoid =
+            Character and
+            Character:FindFirstChildOfClass("Humanoid")
 
         if Humanoid then
             Humanoid.Health = 0
@@ -195,235 +482,234 @@ MainTab:CreateButton({
     end
 })
 
---// PLAYER TAB
-local PlayerTab = Window:CreateTab("Player", 4483362458)
-
-PlayerTab:CreateToggle({
+Player:CreateToggle({
     Name = "Infinite Energy",
     CurrentValue = false,
     Flag = "InfiniteEnergy",
+
     Callback = function(Value)
-        InfEnergy = Value
-
-        task.spawn(function()
-            while InfEnergy do
-                local Character = Player.Character
-
-                if Character then
-                    local Energy = Character:FindFirstChild("Energy")
-
-                    if Energy and Energy:IsA("NumberValue") then
-                        Energy.Value = Energy.MaxValue or 100
-                    end
-                end
-
-                task.wait(0.1)
-            end
-        end)
+        Config.InfiniteEnergy = Value
     end
 })
 
-PlayerTab:CreateButton({
-    Name = "Restore Health",
+--==================================================
+-- TELEPORT
+--==================================================
+
+Teleport:CreateSection("Teleport")
+
+Teleport:CreateButton({
+    Name = "Teleport to Spawn",
+
     Callback = function()
-        local Humanoid = GetHumanoid()
+        Notify("Teleport", "Spawn teleport triggered")
+    end
+})
+
+Teleport:CreateInput({
+    Name = "X Coordinate",
+    PlaceholderText = "X",
+    RemoveTextAfterFocusLost = false,
+    Flag = "XCoordinate",
+
+    Callback = function(Text)
+        Config.X = tonumber(Text) or 0
+    end
+})
+
+Teleport:CreateInput({
+    Name = "Y Coordinate",
+    PlaceholderText = "Y",
+    RemoveTextAfterFocusLost = false,
+    Flag = "YCoordinate",
+
+    Callback = function(Text)
+        Config.Y = tonumber(Text) or 0
+    end
+})
+
+Teleport:CreateInput({
+    Name = "Z Coordinate",
+    PlaceholderText = "Z",
+    RemoveTextAfterFocusLost = false,
+    Flag = "ZCoordinate",
+
+    Callback = function(Text)
+        Config.Z = tonumber(Text) or 0
+    end
+})
+
+Teleport:CreateButton({
+    Name = "Teleport to Coordinates",
+
+    Callback = function()
+
+        local Character =
+            game.Players.LocalPlayer.Character
+
+        local Root =
+            Character and
+            Character:FindFirstChild("HumanoidRootPart")
+
+        if Root then
+            Root.CFrame = CFrame.new(
+                Config.X,
+                Config.Y,
+                Config.Z
+            )
+        end
+    end
+})
+
+--==================================================
+-- DEVELOPER
+--==================================================
+
+Developer:CreateSection("Developer Tools")
+
+Developer:CreateToggle({
+    Name = "FPS Display",
+    CurrentValue = false,
+    Flag = "FPSDisplay",
+
+    Callback = function(Value)
+        Notify("Developer", "FPS Display: " .. tostring(Value))
+    end
+})
+
+Developer:CreateToggle({
+    Name = "Ping Display",
+    CurrentValue = false,
+    Flag = "PingDisplay",
+
+    Callback = function(Value)
+        Notify("Developer", "Ping Display: " .. tostring(Value))
+    end
+})
+
+Developer:CreateToggle({
+    Name = "Position Display",
+    CurrentValue = false,
+    Flag = "PositionDisplay",
+
+    Callback = function(Value)
+        Notify("Developer", "Position Display: " .. tostring(Value))
+    end
+})
+
+Developer:CreateButton({
+    Name = "Character Info",
+
+    Callback = function()
+
+        local Character =
+            game.Players.LocalPlayer.Character
+
+        local Humanoid =
+            Character and
+            Character:FindFirstChildOfClass("Humanoid")
 
         if Humanoid then
-            Humanoid.Health = Humanoid.MaxHealth
+
+            Notify(
+                "Character Info",
+                "Health: " ..
+                math.floor(Humanoid.Health)
+            )
+
         end
     end
 })
 
-PlayerTab:CreateButton({
-    Name = "Restore Energy",
+--==================================================
+-- SERVER
+--==================================================
+
+Server:CreateSection("Server")
+
+Server:CreateButton({
+    Name = "Rejoin Server",
+
     Callback = function()
-        local Character = GetCharacter()
-        local Energy = Character:FindFirstChild("Energy")
 
-        if Energy and Energy:IsA("NumberValue") then
-            Energy.Value = Energy.MaxValue or 100
-        end
-    end
-})
-
---// TELEPORT TAB
-local TeleportTab = Window:CreateTab("Teleport", 4483362458)
-
-local Locations = {}
-
-for _, Object in ipairs(workspace:GetDescendants()) do
-    if Object:IsA("BasePart") and Object.Name == "TeleportPoint" then
-        table.insert(Locations, Object.Name)
-    end
-end
-
-TeleportTab:CreateInput({
-    Name = "Teleport Position",
-    PlaceholderText = "X, Y, Z",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(Text)
-
-        local X, Y, Z = Text:match(
-            "([%-%.%d]+)%s*,%s*([%-%.%d]+)%s*,%s*([%-%.%d]+)"
+        game:GetService("TeleportService"):Teleport(
+            game.PlaceId,
+            game.Players.LocalPlayer
         )
+    end
+})
 
-        if X and Y and Z then
-            local Character = GetCharacter()
-            local Root = Character:FindFirstChild("HumanoidRootPart")
+Server:CreateButton({
+    Name = "Copy Job ID",
 
-            if Root then
-                Root.CFrame = CFrame.new(
-                    tonumber(X),
-                    tonumber(Y),
-                    tonumber(Z)
-                )
-            end
+    Callback = function()
+
+        if setclipboard then
+
+            setclipboard(game.JobId)
+
+            Notify(
+                "Server",
+                "Job ID copied"
+            )
+
+        else
+
+            Notify(
+                "Server",
+                "Clipboard unavailable"
+            )
+
         end
     end
 })
 
---// ESP / DEBUG TAB
-local ESPTab = Window:CreateTab("ESP / Debug", 4483362458)
+--==================================================
+-- SETTINGS
+--==================================================
 
-local ESPObjects = {}
+Settings:CreateSection("Configuration")
 
-local function RemoveESP()
+Settings:CreateButton({
+    Name = "Save Configuration",
 
-    for _, Object in pairs(ESPObjects) do
-        if Object then
-            Object:Destroy()
-        end
-    end
+    Callback = function()
 
-    table.clear(ESPObjects)
-end
-
-local function CreateESP(PlayerObject)
-
-    if PlayerObject == Player then
-        return
-    end
-
-    local Character = PlayerObject.Character
-
-    if not Character then
-        return
-    end
-
-    local Head = Character:FindFirstChild("Head")
-
-    if not Head then
-        return
-    end
-
-    local Billboard = Instance.new("BillboardGui")
-    Billboard.Name = "DebugESP"
-    Billboard.Size = UDim2.new(0, 150, 0, 40)
-    Billboard.StudsOffset = Vector3.new(0, 3, 0)
-    Billboard.AlwaysOnTop = true
-    Billboard.Parent = Head
-
-    local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.fromScale(1, 1)
-    Label.BackgroundTransparency = 1
-    Label.Text = PlayerObject.Name
-    Label.TextScaled = true
-    Label.TextStrokeTransparency = 0
-    Label.Parent = Billboard
-
-    table.insert(ESPObjects, Billboard)
-end
-
-ESPTab:CreateToggle({
-    Name = "Player ESP",
-    CurrentValue = false,
-    Flag = "PlayerESP",
-    Callback = function(Value)
-
-        ESPEnabled = Value
-
-        RemoveESP()
-
-        if not Value then
-            return
-        end
-
-        for _, PlayerObject in ipairs(Players:GetPlayers()) do
-            CreateESP(PlayerObject)
-        end
-    end
-})
-
-Players.PlayerAdded:Connect(function(PlayerObject)
-
-    if ESPEnabled then
-        PlayerObject.CharacterAdded:Connect(function()
-            task.wait(1)
-
-            if ESPEnabled then
-                CreateESP(PlayerObject)
-            end
+        pcall(function()
+            Rayfield:SaveConfiguration()
         end)
-    end
-end)
 
---// COMBAT TESTING
-local CombatTab = Window:CreateTab("Combat", 4483362458)
-
-CombatTab:CreateDropdown({
-    Name = "Target Player",
-    Options = {},
-    CurrentOption = {},
-    MultipleOptions = false,
-    Flag = "TargetPlayer",
-    Callback = function(Option)
-        -- Target selection can be connected
-        -- to your game's combat-testing system.
+        Notify(
+            "Settings",
+            "Configuration saved"
+        )
     end
 })
 
-CombatTab:CreateButton({
-    Name = "Refresh Players",
+Settings:CreateButton({
+    Name = "Reset Movement",
+
     Callback = function()
 
-        local Names = {}
+        Config.Fly = false
+        Config.Noclip = false
+        Config.InfiniteJump = false
+        Config.WalkSpeed = 16
+        Config.JumpPower = 50
 
-        for _, PlayerObject in ipairs(Players:GetPlayers()) do
-            if PlayerObject ~= Player then
-                table.insert(Names, PlayerObject.Name)
-            end
-        end
-
-        Rayfield:Notify({
-            Title = "Players",
-            Content = "Found " .. #Names .. " players.",
-            Duration = 3
-        })
+        Notify(
+            "Settings",
+            "Movement reset"
+        )
     end
 })
 
---// SETTINGS
-local SettingsTab = Window:CreateTab("Settings", 4483362458)
-
-SettingsTab:CreateButton({
-    Name = "Destroy UI",
-    Callback = function()
-        RemoveESP()
-
-        if FlyConnection then
-            FlyConnection:Disconnect()
-        end
-
-        if NoclipConnection then
-            NoclipConnection:Disconnect()
-        end
-
-        Rayfield:Destroy()
-    end
-})
+--==================================================
+-- LOADED
+--==================================================
 
 Rayfield:Notify({
-    Title = "Testing Hub Loaded",
-    Content = "Rayfield testing menu is ready.",
+    Title = "Test Hub",
+    Content = "Rayfield UI loaded successfully!",
     Duration = 5
 })
