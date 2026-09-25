@@ -16,7 +16,7 @@ MainTab:CreateSection("Movement")
 
 MainTab:CreateSlider({
     Name = "Walk Speed",
-    Range = {16, 100},
+    Range = {50, 150},
     Increment = 1,
     Suffix = " Speed",
     CurrentValue = 16,
@@ -58,7 +58,7 @@ MainTab:CreateToggle({
             local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 
             if humanoid then
-                humanoid.WalkSpeed = 16
+                humanoid.WalkSpeed = 50
                 humanoid.JumpPower = 50
             end
         end
